@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# make base test folder if not present
+if [ ! -d test ]; then
+        make_files
+fi
+
+# Make some changes
+cd test
+echo 'some changes' > e
+cd foo
+echo 'another change' >> b
+rm -rf baz
+cd ../bar
+mkdir new
+cd new
+echo 'f new file content' > f
