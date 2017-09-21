@@ -33,9 +33,9 @@ The example we just show is a "fullbackup". "tar" allows us to do two kinds of b
 * level1-# backup: incremental backup
 
 ## Incremental Backup
-Incremental backup considers the base backup and just stores the cahnges relative to the base backup. A baseup is normally a full backup. A level-1 backup is a backup based on a level-0 backup. A level-2 backup is a backup based on a level-1 backup, and so on. Level-1+ incremental backups could save more space but it creates a painful restoration - it requires each level incremental tar to be restored in order.
+Incremental backup considers the base backup and just stores the changes relative to the base backup. A base backup is normally a full backup. A level-1 backup is a backup based on a level-0 backup. A level-2 backup is a backup based on a level-1 backup, and so on. Level-1+ incremental backups could save more space but it creates a painful restoration - it requires each level incremental tar to be restored in order.
 
-Let's say we created a weekly backup "backup-weekly.tar.gz" on SUnday morning 1:00AM. To create incremental backups:
+Let's say we created a weekly backup "backup-weekly.tar.gz" on Sunday morning 1:00AM. To create incremental backups:
 * Simple case: repeated level-1 incrementals.
   * Monday - Saturday: level-1s 
 * Complex case: level-1 to level-7 incrementals:
