@@ -45,3 +45,164 @@ In simple case, file-1.txt created on Monday would be copied in each of the subs
 
 ## Simple Incremental Backups Example:
 Let's do some hands on practises.
+
+* Run make_files bash script:
+```bash
+$ ./make_files
+Creating test parent folder
+Creating subfolders and files
+
+$ tree test/
+test/
+|-- a
+|-- bar
+|   `-- c
+`-- foo
+    |-- b
+    |-- baz
+    |-- c
+    `-- d
+
+3 directories, 5 files
+```
+* Make the level-0 (full backup):
+```bash
+$ tar --listed-incremental test_backup.snar -czpf test_backup_full.tar.gz test
+$ ls
+change_files  make_files  tar-backup.md  test  test_backup_full.tar.gz  test_backup.snar
+```
+Now we have our level-0 full backup. Notice that this time we used the option "--listed-incremental", and we have a "test_backup.snar" file. This file will be used later to tell our subsequent backups what is in the level-0 backup.
+
+* Let's make some changes to the test folder
+```bash
+$ ./change_files
+$ tree test
+test
+|-- a
+|-- bar
+|   |-- c
+|   `-- new
+|       `-- f
+|-- e
+`-- foo
+    |-- b
+    |-- c
+    `-- d
+
+3 directories, 7 files
+```
+You can see the test folder did get changed.
+
+* Let's make a level-1 incremental backup:
+```bash
+$ cp test_backup.snar test_backup.snar.full
+# Let's be careful on the *.snar file, make a copy before playing with it
+$ tar --listed-incremental test_backup.snar -czpf test_backup_incremental_1.tar.gz test
+$ ls
+change_files  tar-backup.md  test_backup_full.tar.gz           test_backup.snar      test_backup.snar.full
+make_files    test           test_backup_incremental_1.tar.gz
+$ diff test_backup.snar test_backup.snar.full
+Binary files test_backup.snar and test_backup.snar.full differ
+```
+Now we have a level-0 and level-1 backup. I can keep making more level-1 backups by using "test_backup.snar.full" file as their --listed-incremental file. You have to make a copy, because "tar' keeps changing the snar file to reflect its work.
+
+## Restore
+Restoring the incremental backup requires you to restore the full backup first. Let's give a try:
+* Remove the test folder:
+```bash
+$ mv test test-bak
+```
+* Restore the full backup
+```bash
+$ tar -xzvpf test_backup_full.tar.gz
+test/
+test/bar/
+test/foo/
+test/foo/baz/
+test/a
+test/bar/c
+test/foo/b
+test/foo/c
+test/foo/d
+$ tree test
+test
+|-- a
+|-- bar
+|   `-- c
+`-- foo
+    |-- b
+    |-- baz
+    |-- c
+    `-- d
+
+3 directories, 5 files
+```
+You can see we are back to the step before we run "change_files" script.
+* Now restore the incremental backup
+```bash
+$ tar -xzvpf test_backup_incremental_1.tar.gz
+test/
+test/bar/
+test/bar/new/
+test/foo/
+test/e
+test/bar/new/f
+test/foo/b
+$ tree test
+test
+|-- a
+|-- bar
+|   |-- c
+|   `-- new
+|       `-- f
+|-- e
+`-- foo
+    |-- b
+    |-- c
+    `-- d
+
+3 directories, 7 files
+$ diff --brief -r test test-bak/
+```
+Now we back to the state that when we just run "change_files" script.
+
+## Incremental Dry Run
+If you want, you can use the "--incremental" option to check what were changed in incremental backups:
+```bash
+$ tar  --incremental -tvvzpf test_backup_incremental_1.tar.gz
+drwxr-xr-x root/root        45 2017-09-21 13:59 test/
+N a
+D bar
+Y e
+D foo
+R test/foo/baz
+T test/bar/new
+
+drwxr-xr-x root/root         9 2017-09-21 13:59 test/bar/
+N c
+D new
+
+drwxr-xr-x root/root         4 2017-09-21 13:59 test/bar/new/
+Y f
+
+drwxr-xr-x root/root        10 2017-09-21 13:59 test/foo/
+Y b
+N c
+N d
+
+-rw-r--r-- root/root        13 2017-09-21 13:59 test/e
+-rw-r--r-- root/root        19 2017-09-21 13:59 test/bar/new/f
+-rw-r--r-- root/root        22 2017-09-21 13:59 test/foo/b
+
+'Y' - filename is contained in the archive.
+
+'N' -filename was present in the directory at the time the archive was made, yet it was not dumped to the archive, because it had not changed since the last backup.
+
+'D' - filename is a directory.
+
+'R' - This code requests renaming of the filename to the name specified with the `T' command, that immediately follows it.
+
+'T' - Specify target file name for `R' command
+
+'X' - Specify temporary directory name for a rename operation (see below).
+```
