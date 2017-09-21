@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Remove existing test folder
+if [ -d test ]; then
+    rm -rf test
+fi
+
+# Make new files and folders
+echo "Creating test parent folder"
+mkdir test
+cd test
+echo "Creating subfolders and files"
+mkdir foo
+mkdir bar
+echo 'a file' > a
+cd foo
+echo 'b file' > b
+mkdir baz
+echo 'c file' > c
+cd ../bar
+echo 'c file' > c
+cd ../foo
+echo 'd file' > d
