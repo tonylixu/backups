@@ -107,6 +107,7 @@ Binary files test_backup.snar and test_backup.snar.full differ
 Now we have a level-0 and level-1 backup. I can keep making more level-1 backups by using "test_backup.snar.full" file as their --listed-incremental file. You have to make a copy, because "tar' keeps changing the snar file to reflect its work.
 
 ## Restore
+### Note: Restore doesn't require the *.snar file
 Restoring the incremental backup requires you to restore the full backup first. Let's give a try:
 * Remove the test folder:
 ```bash
