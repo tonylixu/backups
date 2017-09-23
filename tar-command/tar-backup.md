@@ -95,8 +95,8 @@ You can see the test folder did get changed.
 
 * Let's make a level-1 incremental backup:
 ```bash
-$ cp test_backup.snar test_backup.snar.full
 # Let's be careful on the *.snar file, make a copy before playing with it
+$ cp test_backup.snar test_backup.snar.full
 $ tar --listed-incremental test_backup.snar -czpf test_backup_incremental_1.tar.gz test
 $ ls
 change_files  tar-backup.md  test_backup_full.tar.gz           test_backup.snar      test_backup.snar.full
@@ -140,7 +140,7 @@ test
 You can see we are back to the step before we run "change_files" script.
 * Now restore the incremental backup
 ```bash
-$ tar -xzvpf test_backup_incremental_1.tar.gz
+$ tar --incremental -xzvpf test_backup_incremental_1.tar.gz
 test/
 test/bar/
 test/bar/new/
