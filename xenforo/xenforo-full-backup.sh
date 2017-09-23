@@ -9,5 +9,5 @@ echo "mysqldump --opt -uUNAME -pPASSWD xenforo > $MYSQL_BACKUP_PATH/xenforo-$DAT
 mysqldump --opt -u$UNAME -p$PASSWD xenforo > $MYSQL_BACKUP_PATH/xenforo$DATE.sql
 
 echo "Backing up files..."
-echo "tar -chf - /var/www/xenforo  | gzip -c > $DATA_BACKUP_PATH/xenforo-DATE.tar.gz"
-tar -chf - /var/www/xenforo  | gzip -c > $DATA_BACKUP_PATH/xenforo-$DATE.tar.gz
+echo "tar -czphf $DATA_BACKUP_PATH/xenforo-$DATE.tar.gz /var/www/xenforo"
+tar -czphf $DATA_BACKUP_PATH/xenforo-$DATE.tar.gz /var/www/xenforo
